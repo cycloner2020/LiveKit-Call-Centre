@@ -1,0 +1,12 @@
+install python packages
+create the .env file
+get openai api key
+explain the arhcitecrure
+create the minimal assitant
+show testing with localhost
+add function calling
+add database
+
+create frontend
+npm create vite@latest frontend -- --template react
+npm install @livekit/components-react @livekit/components-styles livekit-client --save
