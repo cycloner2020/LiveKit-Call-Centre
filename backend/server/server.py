@@ -4,6 +4,8 @@ from livekit import api
 from flask import Flask, request
 from dotenv import load_dotenv
 from flask_cors import CORS
+from livekit.api import LiveKitAPI
+from livekit.api import ListRoomsRequest
 import uuid
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
@@ -18,6 +20,12 @@ async def generate_room_name():
     while name in rooms:
         name = "room-" + str(uuid.uuid4())[:8]
     return name
+
+async def get_rooms():
+    api = LiveKitAPI()
+    rooms = await api.room.list_rooms(ListRoomsRequest())
+    await api.aclose()
+    return list([room.name for room in rooms.rooms])
 
 @app.route('/getToken')
 async def getToken():
