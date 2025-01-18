@@ -71,7 +71,6 @@ const LiveKitModal = ({ setShowSupport }) => {
             >
               <RoomAudioRenderer />
               <SimpleVoiceAssistant />
-              <VoiceAssistantControlBar />
             </LiveKitRoom>
           ) : null}
         </div>
