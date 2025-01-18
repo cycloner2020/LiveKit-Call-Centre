@@ -1,13 +1,14 @@
 import { useVoiceAssistant, BarVisualizer, VoiceAssistantControlBar, useTrackTranscription, useLocalParticipant } from "@livekit/components-react";
 import { Track } from 'livekit-client';
 import { useEffect, useState } from 'react';
+import './SimpleVoiceAssistant.css';
 
 const Message = ({ type, text }) => (
-  <div style={{ marginBottom: '10px' }}>
-    <strong style={{ color: type === 'agent' ? '#4a90e2' : '#2ecc71' }}>
+  <div className="message">
+    <strong className={`message-${type}`}>
       {type === 'agent' ? 'Agent: ' : 'You: '}
     </strong>
-    <span>{text}</span>
+    <span className="message-text">{text}</span>
   </div>
 );
 
@@ -32,16 +33,17 @@ const SimpleVoiceAssistant = () => {
   }, [agentTranscriptions, userTranscriptions]);
 
   return (
-    <>
-      <BarVisualizer
-        state={state}
-        barCount={7}
-        trackRef={audioTrack}
-        style={{ width: '75vw', height: '300px' }}
-      />
-      <div className="h-80">
+    <div className="voice-assistant-container">
+      <div className="visualizer-container">
+        <BarVisualizer
+          state={state}
+          barCount={7}
+          trackRef={audioTrack}
+        />
+      </div>
+      <div className="control-section">
         <VoiceAssistantControlBar />
-        <div className="conversation" style={{ padding: '20px', maxHeight: '300px', overflowY: 'auto' }}>
+        <div className="conversation">
           {messages.map((msg, index) => (
             <Message 
               key={msg.id || index}
@@ -51,7 +53,7 @@ const SimpleVoiceAssistant = () => {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
