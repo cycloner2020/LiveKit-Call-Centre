@@ -8,7 +8,9 @@ from db_driver import DatabaseDriver
 logger = logging.getLogger("user-data")
 logger.setLevel(logging.INFO)
 
+logger.info("Initializing API module")
 DB = DatabaseDriver()
+logger.info("Database driver initialized")
 
 class CarDetails(enum.Enum):
     VIN = "vin"
@@ -19,6 +21,7 @@ class CarDetails(enum.Enum):
 
 class AssistantFnc(llm.FunctionContext):
     def __init__(self) -> None:
+        logger.info("Initializing AssistantFnc")
         super().__init__()
         
         self._car_details = {
@@ -27,36 +30,42 @@ class AssistantFnc(llm.FunctionContext):
             CarDetails.Model: "",
             CarDetails.Year: ""
         }
+        logger.info("Car details initialized: %s", self._car_details)
 
     @llm.ai_callable(description="lookup a card by its vin")
     def lookup_car(
         self,
         vin: Annotated[int, llm.TypeInfo(description="The vin of the car to lookup")]
     ):
-        logger.info("lookup car - vin: %s", vin)
+        logger.info("Entering lookup_car function with VIN: %s", vin)
         
         result = DB.get_car_by_vin(vin)
         if result is None:
+            logger.info("No car found for VIN: %s", vin)
             return "Car not found"
         
+        logger.info("Car found, updating car details state")
         self._car_details = {
             CarDetails.VIN: result.vin,
             CarDetails.Make: result.make,
             CarDetails.Model: result.model,
             CarDetails.Year: result.year
         }
+        logger.info("Updated car details: %s", self._car_details)
 
         car_str = ""
         for key, value in self._car_details.items():
             car_str += f"{key}: {value}\n"
         
+        logger.info("Returning car details string")
         return f"The car details are: {car_str}"
 
     @llm.ai_callable(description="get the car details of the current car")
     def get_car_details(
         self
     ):
-        logger.info("get car details")
+        logger.info("Entering get_car_details function")
+        logger.info("Current car details state: %s", self._car_details)
         
         car_str = ""
         for key, value in self._car_details:
@@ -72,21 +81,27 @@ class AssistantFnc(llm.FunctionContext):
         model: Annotated[str, llm.TypeInfo(description="the model of the car")],
         year: Annotated[int, llm.TypeInfo(description="the year of the car")]
     ):
-        logger.info("create card - vin: %s, make: %s, model: %s, year: %s", vin, make, model, year)
+        logger.info("Entering create_car function")
+        logger.info("Parameters - VIN: %s, Make: %s, Model: %s, Year: %s", vin, make, model, year)
         
         result = DB.create_car(vin, make, model, year)
         if result is None:
+            logger.error("Failed to create car in database")
             return "Failed to create car"
         
+        logger.info("Car created successfully, updating car details state")
         self._car_details = {
             CarDetails.VIN: result.vin,
             CarDetails.Make: result.make,
             CarDetails.Model: result.model,
             CarDetails.Year: result.year
         }
+        logger.info("Updated car details: %s", self._car_details)
         
         return "Car created"
     
     def has_car(self):
-        return self._car_details[CarDetails.VIN] != ""
-    
+        logger.info("Checking if car exists in current state")
+        has_car = self._car_details[CarDetails.VIN] != ""
+        logger.info("Has car: %s", has_car)
+        return has_car

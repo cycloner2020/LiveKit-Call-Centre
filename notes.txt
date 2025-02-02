@@ -1,3 +1,12 @@
+cd backend/server; python server.py
+cd backend/agent; python backend.py dev
+cd frontend; npm run dev
+
+cd backend-pizza/server; python server.py
+cd backend-pizza/agent; python backend.py dev
+cd frontend; npm run dev
+
+
 install python packages
 create the .env file
 get openai api key
